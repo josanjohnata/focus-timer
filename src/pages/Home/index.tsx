@@ -4,6 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
 import { useEffect, useState } from 'react'
 import { differenceInSeconds } from 'date-fns'
+
+// import Confetti from 'react-confetti'
+
 import {
   CountdownContainer,
   FormContainer,
@@ -19,7 +22,7 @@ const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Report the task!'),
   minutesAmount: zod
     .number()
-    .min(5, 'The cycle needs a minimum of 5 minutes.')
+    .min(1, 'The cycle needs a minimum of 5 minutes.')
     .max(60, 'The cycle needs a maximum of 60 minutes.'),
 })
 
@@ -31,6 +34,7 @@ interface Cycle {
   minutesAmount: number
   startDate: Date
   interruptedDate?: Date
+  finishedDate?: Date
 }
 
 export function Home() {
@@ -48,21 +52,41 @@ export function Home() {
 
   const activeCycle = cycles.find((cycles) => cycles.id === activeCycleId)
 
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+
   useEffect(() => {
     let interval: any
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate),
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
         )
+
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+
+          setAmountSecondsPassed(totalSeconds)
+          clearInterval(interval)
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
       }, 1000)
     }
 
     return () => {
       clearInterval(interval)
     }
-  }, [activeCycle])
+  }, [activeCycle, totalSeconds, activeCycleId])
 
   const handleCreateNewCycle = (data: newCycleFormData) => {
     const id = String(new Date().getTime())
@@ -82,8 +106,8 @@ export function Home() {
   }
 
   const handleInterruptCycle = () => {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (cycle.id === activeCycleId) {
           return { ...cycle, interruptedDate: new Date() }
         } else {
@@ -94,7 +118,6 @@ export function Home() {
     setActiveCycleId(null)
   }
 
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
   const minutesAmount = Math.floor(currentSeconds / 60)
@@ -138,7 +161,7 @@ export function Home() {
             placeholder="00"
             type="number"
             step={5}
-            min={5}
+            min={1}
             max={60}
             disabled={!!activeCycle}
             {...register('minutesAmount', { valueAsNumber: true })}
@@ -167,6 +190,21 @@ export function Home() {
           </StartCountdownButton>
         )}
       </form>
+      {/* {minutes === '0' && seconds === '0' ? (
+        <Confetti
+          drawShape={(ctx) => {
+            ctx.beginPath()
+            for (let i = 0; i < 22; i++) {
+              const angle = 0.35 * i
+              const x = (0.2 + 1.5 * angle) * Math.cos(angle)
+              const y = (0.2 + 1.5 * angle) * Math.sin(angle)
+              ctx.lineTo(x, y)
+            }
+            ctx.stroke()
+            ctx.closePath()
+          }}
+        />
+      ) : null} */}
     </HomeContainer>
   )
 }
