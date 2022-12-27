@@ -1,5 +1,5 @@
 import { Pause, Play } from 'phosphor-react'
-import { useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import { differenceInSeconds } from 'date-fns'
 
 // import Confetti from 'react-confetti'
@@ -21,6 +21,12 @@ interface Cycle {
   interruptedDate?: Date
   finishedDate?: Date
 }
+
+interface CycleContextType {
+  activeCycle: Cycle | undefined
+}
+
+export const CycleContext = createContext({} as CycleContextType)
 
 export function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
@@ -78,8 +84,10 @@ export function Home() {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        <NewCycleForm />
-        <Countdown />
+        <CycleContext.Provider value={{ activeCycle }}>
+          <NewCycleForm />
+          <Countdown />
+        </CycleContext.Provider>
 
         {activeCycle ? (
           <StopCountdownButton onClick={handleInterruptCycle} type="button">
