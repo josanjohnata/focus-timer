@@ -4,6 +4,7 @@ import { CycleContext } from '../../contexts/CyclesContext'
 
 export function History() {
   const { cycles } = useContext(CycleContext)
+  
   return (
     <HistoryContainer>
       <h1>My History</h1>
