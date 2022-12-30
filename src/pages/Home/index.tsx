@@ -1,8 +1,9 @@
 import { Pause, Play } from 'phosphor-react'
+
 import * as zod from 'zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-// import Confetti from 'react-confetti'
+// // import Confetti from 'react-confetti'
 
 import {
   HomeContainer,
@@ -49,11 +50,8 @@ export function Home() {
   return (
     <HomeContainer>
       <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
-        <FormProvider {...newCycleForm}>
-          <NewCycleForm />
-        </FormProvider>
+        <FormProvider {...newCycleForm}>{<NewCycleForm />}</FormProvider>
         <Countdown />
-
         {activeCycle ? (
           <StopCountdownButton onClick={interruptCurrentCycle} type="button">
             <Pause size={24} />
@@ -66,21 +64,21 @@ export function Home() {
           </StartCountdownButton>
         )}
       </form>
-      {/* {minutes === '0' && seconds === '0' ? (
-        <Confetti
-          drawShape={(ctx) => {
-            ctx.beginPath()
-            for (let i = 0; i < 22; i++) {
-              const angle = 0.35 * i
-              const x = (0.2 + 1.5 * angle) * Math.cos(angle)
-              const y = (0.2 + 1.5 * angle) * Math.sin(angle)
-              ctx.lineTo(x, y)
-            }
-            ctx.stroke()
-            ctx.closePath()
-          }}
-        />
-      ) : null} */}
+      {/* {minutes === '0' && seconds === '0' ? ( */}
+      {/* <Confetti  
+              drawShape={(ctx) => {
+                ctx.beginPath()
+                for (let i = 0; i < 22; i++) {
+                  const angle = 0.35 * i
+                  const x = (0.2 + 1.5 * angle) * Math.cos(angle)
+                  const y = (0.2 + 1.5 * angle) * Math.sin(angle)
+                  ctx.lineTo(x, y)
+                }
+                ctx.stroke()
+                ctx.closePath()
+              }}
+            />
+          ) : null */}
     </HomeContainer>
   )
 }
